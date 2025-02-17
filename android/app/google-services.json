@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "874376046993",
+    "firebase_url": "https://patubig-6b04f-default-rtdb.firebaseio.com",
+    "project_id": "patubig-6b04f",
+    "storage_bucket": "patubig-6b04f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:874376046993:android:f5e14b2746686c4d73d230",
+        "android_client_info": {
+          "package_name": "com.example.patubig_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxI-daKNDh-EcSLzt3047G0GUDBsrvBj0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
