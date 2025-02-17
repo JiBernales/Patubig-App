@@ -195,7 +195,9 @@ class _MapCardState extends State<MapCard> {
                 mapController: _mapController,
                 options: MapOptions(
                   initialCenter: _currentPosition,
-                  initialZoom: 13.0,
+                  initialZoom: 14.0,
+                  maxZoom: 20.5,
+                  minZoom: 11.0,
                 ),
                 children: [
                   TileLayer(
