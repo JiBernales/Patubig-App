@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'farm.dart';
 import 'firebase_options.dart';
@@ -10,13 +9,15 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MainScreen(),
     );
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -32,8 +35,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    WeatherStatsScreen(),
-    WeatherCalendarScreen(),
+    const WeatherStatsScreen(),
+    const WeatherCalendarScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -49,14 +52,14 @@ class _MainScreenState extends State<MainScreen> {
       body: Column(
         children: [
           SizedBox(height: MediaQuery.of(context).size.height * 0.075,),
-          UserProfileCard(),
+          const UserProfileCard(),
           Expanded(child: _pages[_selectedIndex]),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.thermostat_auto), label: 'Farm Status'),
           BottomNavigationBarItem(icon: Icon(Icons.foggy), label: 'Weather and Calendar'),
         ],
@@ -66,6 +69,8 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class UserProfileCard extends StatefulWidget {
+  const UserProfileCard({super.key});
+
   @override
   _UserProfileCardState createState() => _UserProfileCardState();
 }
@@ -74,7 +79,7 @@ class _UserProfileCardState extends State<UserProfileCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       color: Colors.grey[200],
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
@@ -82,8 +87,8 @@ class _UserProfileCardState extends State<UserProfileCard> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-        padding: EdgeInsets.all(16),
-        child: Row(
+        padding: const EdgeInsets.all(16),
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(

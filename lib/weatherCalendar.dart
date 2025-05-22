@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:weather/weather.dart';
-import 'main.dart';
 
 String formatWeatherDescription(String? weatherAPICode) {
   if (weatherAPICode == null) return "No Signal";
@@ -27,11 +26,13 @@ String formatWeatherDescription(String? weatherAPICode) {
 }
 
 class WeatherCalendarScreen extends StatelessWidget {
+  const WeatherCalendarScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: SafeArea(
+      body: const SafeArea(
         child: Column(
           children: [
             WeatherForecastCard(),
@@ -44,6 +45,8 @@ class WeatherCalendarScreen extends StatelessWidget {
 }
 
 class WeatherForecastCard extends StatefulWidget {
+  const WeatherForecastCard({super.key});
+
   @override
   _WeatherForecastCardState createState() => _WeatherForecastCardState();
 }
@@ -97,7 +100,7 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
   Widget build(BuildContext context) {
     String today = DateFormat('EEEE').format(DateTime.now());
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.175,
         decoration: BoxDecoration(
@@ -111,9 +114,9 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
             Row(
               children: [
                 SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                Icon(Icons.cloud, size: 24),
+                const Icon(Icons.cloud, size: 24),
                 SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("FarmID00111", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -129,9 +132,9 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
                 children: [
                   Column(
                     children: [
-                      Text(_isLoading ? "" :"$today", textAlign: TextAlign.center),
+                      Text(_isLoading ? "" :today, textAlign: TextAlign.center),
                       _isLoading
-                          ? CircularProgressIndicator()
+                          ? const CircularProgressIndicator()
                           : Icon(
                         _getWeatherIcon(_weather?.weatherIcon),
                         size: 70,
@@ -140,7 +143,7 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
                       Text(
                         _isLoading ? "" : formatWeatherDescription(_weather?.weatherMain),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -149,7 +152,7 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
                       children: [
                         WeatherDay(
                           day: DateFormat('EEE').format(_forecast![0].date!),
-                          label: formatWeatherDescription(_forecast![0]?.weatherMain),
+                          label: formatWeatherDescription(_forecast![0].weatherMain),
                           icon: _getWeatherIcon(_forecast![0].weatherIcon),
                         ),
                       ],
@@ -158,7 +161,7 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
                       children: [
                         WeatherDay(
                           day: DateFormat('EEE').format(_forecast![7].date!),
-                          label: formatWeatherDescription(_forecast![7]?.weatherMain),
+                          label: formatWeatherDescription(_forecast![7].weatherMain),
                           icon: _getWeatherIcon(_forecast![7].weatherIcon),
                         ),
                       ],
@@ -167,7 +170,7 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
                       children: [
                         WeatherDay(
                           day: DateFormat('EEE').format(_forecast![15].date!),
-                          label: formatWeatherDescription(_forecast![15]?.weatherMain),
+                          label: formatWeatherDescription(_forecast![15].weatherMain),
                           icon: _getWeatherIcon(_forecast![15].weatherIcon),
                         ),
                       ],
@@ -219,7 +222,7 @@ class WeatherDay extends StatelessWidget {
   final String label;
   final IconData icon;
 
-  WeatherDay({required this.day, required this.label, required this.icon});
+  const WeatherDay({super.key, required this.day, required this.label, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -229,14 +232,16 @@ class WeatherDay extends StatelessWidget {
         Container(
           child: Icon(icon, size: 30, color: Colors.black),
         ),
-        SizedBox(height: 4),
-        Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
   }
 }
 
 class PlantingDateCard extends StatefulWidget {
+  const PlantingDateCard({super.key});
+
   @override
   _PlantingDateCardState createState() => _PlantingDateCardState();
 }
@@ -252,22 +257,20 @@ class _PlantingDateCardState extends State<PlantingDateCard> {
       lastDate: DateTime(2100),
     );
 
-    if (newDate != null) {
-      setState(() {
-        selectedDate = newDate;
-      });
+    setState(() {
+      selectedDate = newDate!;
+    });
     }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.4,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
         ),
         child: Stack(
           children: [
@@ -286,7 +289,7 @@ class _PlantingDateCardState extends State<PlantingDateCard> {
                 width: MediaQuery.of(context).size.width * 0.6,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.8),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(12),
                     bottomRight: Radius.circular(12),
                   ),
@@ -294,23 +297,23 @@ class _PlantingDateCardState extends State<PlantingDateCard> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Started Planting",
                       style: TextStyle(
                           color: Colors.red,
                           fontSize: 24,
                           fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
-                      "${_getMonth(selectedDate.month)}",
+                      _getMonth(selectedDate.month),
                       style:
-                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       "${selectedDate.day}",
                       style:
-                      TextStyle(fontSize: 72, fontWeight: FontWeight.bold),
+                      const TextStyle(fontSize: 72, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -321,7 +324,7 @@ class _PlantingDateCardState extends State<PlantingDateCard> {
               right: 8,
               child: GestureDetector(
                 onTap: () => _pickDate(context),
-                child: Icon(Icons.edit, color: Colors.blue, size: 24),
+                child: const Icon(Icons.edit, color: Colors.blue, size: 24),
               ),
             ),
           ],

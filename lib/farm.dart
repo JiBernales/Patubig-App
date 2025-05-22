@@ -2,10 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:weather/weather.dart';
-import 'main.dart';
 
 Future<void> _checkLocationPermission() async {
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -32,6 +29,8 @@ Future<void> _checkLocationPermission() async {
 }
 
 class WeatherStatsScreen extends StatefulWidget {
+  const WeatherStatsScreen({super.key});
+
   @override
   _WeatherStatsScreenState createState() => _WeatherStatsScreenState();
 }
@@ -65,8 +64,8 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
           children: [
             _weatherData != null
                 ? StatsCard(weatherData: _weatherData!)
-                : CircularProgressIndicator(),
-            MapCard(),
+                : const CircularProgressIndicator(),
+            const MapCard(),
           ],
         ),
       ),
@@ -76,12 +75,12 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
 
 class StatsCard extends StatelessWidget {
   final Map<String, dynamic> weatherData;
-  StatsCard({required this.weatherData});
+  const StatsCard({super.key, required this.weatherData});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -101,7 +100,7 @@ class Stat extends StatelessWidget {
   final String value;
   final Color color;
 
-  Stat({required this.icon, required this.label, required this.value, required this.color});
+  const Stat({super.key, required this.icon, required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -111,17 +110,17 @@ class Stat extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1)],
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1)],
       ),
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Icon(icon, color: color, size: 28),
-          SizedBox(height: 8),
-          Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-          SizedBox(height: 4),
-          Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize:
+          const SizedBox(height: 8),
+          Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize:
           8, color: Colors.grey)),
         ],
       ),
@@ -130,6 +129,8 @@ class Stat extends StatelessWidget {
 }
 
 class MapCard extends StatefulWidget {
+  const MapCard({super.key});
+
   @override
 
   _MapCardState createState() => _MapCardState();
@@ -143,7 +144,7 @@ class _MapCardState extends State<MapCard> {
   void initState() {
     super.initState();
     _mapController = MapController();
-    _currentPosition = LatLng(10.866519, 122.729620);
+    _currentPosition = const LatLng(10.866519, 122.729620);
     _loadLocation();
   }
 
@@ -158,12 +159,12 @@ class _MapCardState extends State<MapCard> {
 
   void _zoomIn() {
     double currentZoom = _mapController.camera.zoom;
-  _mapController.move(LatLng(_currentPosition.latitude!, _currentPosition.longitude!), currentZoom + 0.5);
+  _mapController.move(LatLng(_currentPosition.latitude, _currentPosition.longitude), currentZoom + 0.5);
   }
 
   void _zoomOut() {
     double currentZoom = _mapController.camera.zoom;
-  _mapController.move(LatLng(_currentPosition.latitude!, _currentPosition.longitude!), currentZoom - 0.5);
+  _mapController.move(LatLng(_currentPosition.latitude, _currentPosition.longitude), currentZoom - 0.5);
   }
 
   void _centerOnMarker() {
@@ -172,7 +173,7 @@ class _MapCardState extends State<MapCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: Container(
         height: MediaQuery
             .of(context)
@@ -181,12 +182,12 @@ class _MapCardState extends State<MapCard> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1)
           ],
         ),
         child: _currentPosition == null
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Stack(
@@ -206,21 +207,21 @@ class _MapCardState extends State<MapCard> {
                   MarkerLayer(
                     markers: [
                       Marker(
-                        point: LatLng(_currentPosition.latitude!, _currentPosition.longitude!),
-                        child: Icon(
+                        point: LatLng(_currentPosition.latitude, _currentPosition.longitude),
+                        child: const Icon(
                           Icons.location_pin,
                           color: Colors.red,
                         ),
                       ),
-                      Marker(
+                      const Marker(
                         point: LatLng(10.869182, 122.728615),
                         child: Icon(Icons.sensors, color: Colors.red),
                       ),
-                      Marker(
+                      const Marker(
                         point: LatLng(10.865102, 122.734650),
                         child: Icon(Icons.sensors, color: Colors.red),
                       ),
-                      Marker(
+                      const Marker(
                         point: LatLng(10.862329, 122.726496),
                         child: Icon(Icons.sensors, color: Colors.red),
                       ),
@@ -229,20 +230,20 @@ class _MapCardState extends State<MapCard> {
                 ],
               ),
               Positioned(
-                child: FloatingActionButton(
-                    onPressed: _zoomIn, child: Icon(Icons.add, color: Colors.black,),
-                  backgroundColor: Colors.white,
-                ),
                 bottom: 75,
                 right: 10,
+                child: FloatingActionButton(
+                    onPressed: _zoomIn,
+                  backgroundColor: Colors.white, child: const Icon(Icons.add, color: Colors.black,),
+                ),
               ),
               Positioned(
-                child: FloatingActionButton(
-                    onPressed: _zoomOut, child: Icon(Icons.remove, color: Colors.black,),
-                    backgroundColor: Colors.white,
-                ),
                 bottom: 10,
                 right: 10,
+                child: FloatingActionButton(
+                    onPressed: _zoomOut,
+                    backgroundColor: Colors.white, child: const Icon(Icons.remove, color: Colors.black,),
+                ),
               ),
             ],
           )
