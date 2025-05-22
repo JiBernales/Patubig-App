@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:patubig_app/features/farm/view/weather_stats_screen.dart';
 import 'package:patubig_app/firebase_options.dart';
 import 'package:provider/provider.dart';
 
 import 'core/services/firebase_service.dart';
 import 'core/utils/constants.dart';
-import 'features/farm/view/farm_screen.dart';
 import 'features/farm/viewmodel/farm_viewmodel.dart';
 import 'features/weather/view/weather_calendar_screen.dart';
 import 'features/weather/viewmodel/weather_viewmodel.dart';
@@ -25,7 +25,7 @@ class PatubigApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => FarmViewModel()),
+        ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
         ChangeNotifierProvider(create: (_) => WeatherViewModel()),
       ],
       child: MaterialApp(
@@ -37,7 +37,7 @@ class PatubigApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
-          '/': (context) => const FarmScreen(),
+          '/': (context) => const WeatherStatsScreen(),
           '/weather': (context) => const WeatherCalendarScreen(),
         },
       ),
