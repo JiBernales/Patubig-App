@@ -25,12 +25,12 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF2E7D32),
           brightness: Brightness.light,
         ),
-        // cardTheme: CardTheme(
-        //   elevation: 2,
-        //   shape: RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.circular(16),
-        //   ),
-        // ),
+        cardTheme: CardTheme(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           elevation: 0,
