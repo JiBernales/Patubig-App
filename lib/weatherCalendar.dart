@@ -31,11 +31,13 @@ class WeatherCalendarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
-      body: const SafeArea(
+      backgroundColor: Colors.transparent,
+      body: const SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           children: [
             WeatherForecastCard(),
+            SizedBox(height: 16),
             PlantingDateCard(),
           ],
         ),
@@ -59,29 +61,17 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
   @override
   void initState() {
     super.initState();
-    // _checkLocationPermission();
     _fetchWeather();
   }
 
   Future<void> _fetchWeather() async {
     String key = '836910daaadaa62acd9d3f662a6d6e0b';
-    int x = 0;
     try {
       Position position = await Geolocator.getCurrentPosition();
       WeatherFactory wf = WeatherFactory(key, language: Language.ENGLISH);
 
       List<Weather> forecast = await wf.fiveDayForecastByLocation(
           position.latitude, position.longitude);
-
-      /*print("\n====== WEATHER FORECAST DATA ======");
-      for (Weather weather in forecast) {
-        print(
-            "Date: ${DateFormat('yyyy-MM-dd – HH:mm').format(weather.date!)}\n"
-                "Condition: ${weather.weatherMain}\n"
-                "Description: ${weather.weatherDescription}\n" + x.toString()
-        );
-        x++;
-      }*/
 
       setState(() {
         _weather = forecast[0];
@@ -99,120 +89,234 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
   @override
   Widget build(BuildContext context) {
     String today = DateFormat('EEEE').format(DateTime.now());
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.175,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child:
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                const Icon(Icons.cloud, size: 24),
-                SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("FarmID00111", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("Palay", style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8, bottom: 12),
+            child: Text(
+              "Weather Forecast",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          Card(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade50,
+                    Colors.white,
                   ],
                 ),
-              ],
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.0025),
-            Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
+                  Row(
                     children: [
-                      Text(_isLoading ? "" :today, textAlign: TextAlign.center),
-                      _isLoading
-                          ? const CircularProgressIndicator()
-                          : Icon(
-                        _getWeatherIcon(_weather?.weatherIcon),
-                        size: 70,
-                        color: Colors.black,
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.agriculture_rounded,
+                          color: Colors.green,
+                          size: 24,
+                        ),
                       ),
-                      Text(
-                        _isLoading ? "" : formatWeatherDescription(_weather?.weatherMain),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      const SizedBox(width: 12),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "FarmID00111",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            "Rice Field - Palay",
+                            style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  if (_forecast != null && _forecast!.length > 2)...[
-                    Column(
-                      children: [
-                        WeatherDay(
-                          day: DateFormat('EEE').format(_forecast![0].date!),
-                          label: formatWeatherDescription(_forecast![0].weatherMain),
-                          icon: _getWeatherIcon(_forecast![0].weatherIcon),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        WeatherDay(
-                          day: DateFormat('EEE').format(_forecast![7].date!),
-                          label: formatWeatherDescription(_forecast![7].weatherMain),
-                          icon: _getWeatherIcon(_forecast![7].weatherIcon),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        WeatherDay(
-                          day: DateFormat('EEE').format(_forecast![15].date!),
-                          label: formatWeatherDescription(_forecast![15].weatherMain),
-                          icon: _getWeatherIcon(_forecast![15].weatherIcon),
-                        ),
-                      ],
+                  const SizedBox(height: 24),
+                  if (_isLoading)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: CircularProgressIndicator(),
+                      ),
                     )
-                  ]
-                ]
+                  else
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: _buildTodayWeather(today),
+                        ),
+                        if (_forecast != null && _forecast!.length > 15) ...[
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 3,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                WeatherDay(
+                                  day: DateFormat('EEE').format(_forecast![0].date!),
+                                  label: formatWeatherDescription(_forecast![0].weatherMain),
+                                  icon: _getWeatherIcon(_forecast![0].weatherIcon),
+                                  isCompact: true,
+                                ),
+                                WeatherDay(
+                                  day: DateFormat('EEE').format(_forecast![7].date!),
+                                  label: formatWeatherDescription(_forecast![7].weatherMain),
+                                  icon: _getWeatherIcon(_forecast![7].weatherIcon),
+                                  isCompact: true,
+                                ),
+                                WeatherDay(
+                                  day: DateFormat('EEE').format(_forecast![15].date!),
+                                  label: formatWeatherDescription(_forecast![15].weatherMain),
+                                  icon: _getWeatherIcon(_forecast![15].weatherIcon),
+                                  isCompact: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ]
+                      ],
+                    ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildTodayWeather(String today) {
+    return Column(
+      children: [
+        Text(
+          today,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(
+            _getWeatherIcon(_weather?.weatherIcon),
+            size: 60,
+            color: _getWeatherColor(_weather?.weatherMain),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          formatWeatherDescription(_weather?.weatherMain),
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        if (_weather?.temperature?.celsius != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            "${_weather!.temperature!.celsius!.round()}°C",
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Color _getWeatherColor(String? weatherMain) {
+    switch (weatherMain) {
+      case "Clear":
+        return Colors.orange;
+      case "Clouds":
+        return Colors.grey;
+      case "Rain":
+      case "Drizzle":
+        return Colors.blue;
+      case "Thunderstorm":
+        return Colors.deepPurple;
+      case "Snow":
+        return Colors.lightBlue;
+      default:
+        return Colors.grey;
+    }
   }
 
   IconData _getWeatherIcon(String? weatherIcon) {
     switch (weatherIcon) {
       case "01d":
-        return Icons.wb_sunny;
+        return Icons.wb_sunny_rounded;
       case "01n":
-        return Icons.nightlight_round;
+        return Icons.nightlight_rounded;
       case "02d":
       case "02n":
       case "03d":
       case "03n":
       case "04d":
       case "04n":
-        return Icons.cloud;
+        return Icons.cloud_rounded;
       case "09d":
       case "09n":
       case "10d":
       case "10n":
-        return Icons.grain;
+        return Icons.grain_rounded;
       case "11d":
       case "11n":
-        return Icons.flash_on;
+        return Icons.flash_on_rounded;
       case "13d":
       case "13n":
-        return Icons.ac_unit;
+        return Icons.ac_unit_rounded;
       case "50d":
       case "50n":
-        return Icons.filter_drama;
+        return Icons.filter_drama_rounded;
       default:
-        return Icons.help_outline;
+        return Icons.help_outline_rounded;
     }
   }
 }
@@ -221,20 +325,61 @@ class WeatherDay extends StatelessWidget {
   final String day;
   final String label;
   final IconData icon;
+  final bool isCompact;
 
-  const WeatherDay({super.key, required this.day, required this.label, required this.icon});
+  const WeatherDay({
+    super.key,
+    required this.day,
+    required this.label,
+    required this.icon,
+    this.isCompact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(day),
-        Container(
-          child: Icon(icon, size: 30, color: Colors.black),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-      ],
+    return Container(
+      padding: EdgeInsets.all(isCompact ? 8 : 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            day,
+            style: TextStyle(
+              fontSize: isCompact ? 10 : 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: isCompact ? 4 : 8),
+          Icon(
+            icon,
+            size: isCompact ? 20 : 30,
+            color: Colors.black87,
+          ),
+          SizedBox(height: isCompact ? 4 : 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: isCompact ? 8 : 10,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -255,80 +400,186 @@ class _PlantingDateCardState extends State<PlantingDateCard> {
       initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Colors.green,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
-    setState(() {
-      selectedDate = newDate!;
-    });
+    if (newDate != null) {
+      setState(() {
+        selectedDate = newDate;
+      });
     }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.4,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
-        ),
-        child: Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                'https://images.pexels.com/photos/265216/pexels-photo-265216.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8, bottom: 12),
+            child: Text(
+              "Planting Schedule",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.6,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.8),
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
+          ),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: Container(
+              height: 250,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF4CAF50),
+                          Color(0xFF81C784),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Started Planting",
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.transparent,
+                          Colors.white.withOpacity(0.9),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      _getMonth(selectedDate.month),
-                      style:
-                      const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            'https://images.pexels.com/photos/265216/pexels-photo-265216.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+                          ),
+                          fit: BoxFit.cover,
+                          opacity: 0.7,
+                        ),
+                      ),
                     ),
-                    Text(
-                      "${selectedDate.day}",
-                      style:
-                      const TextStyle(fontSize: 72, fontWeight: FontWeight.bold),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 0, 119, 4).withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              "Planting Started",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _getMonth(selectedDate.month),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "${selectedDate.day}",
+                              style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                  Positioned(
+                    bottom: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: () => _pickDate(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.edit_calendar_rounded,
+                          color: Colors.green,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            Positioned(
-              bottom: 8,
-              right: 8,
-              child: GestureDetector(
-                onTap: () => _pickDate(context),
-                child: const Icon(Icons.edit, color: Colors.blue, size: 24),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

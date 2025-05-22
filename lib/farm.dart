@@ -59,14 +59,15 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: SafeArea(
-        child: Column(
-          children: [
-            _weatherData != null
-                ? StatsCard(weatherData: _weatherData!)
-                : const CircularProgressIndicator(),
-            const MapCard(),
-          ],
+            body: SafeArea(
+        child: SingleChildScrollView( // Good to have for responsiveness
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StatsCard(weatherData: _weatherData),
+              const MapCard(),
+            ],
+          ),
         ),
       ),
     );
@@ -74,46 +75,57 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
 }
 
 class StatsCard extends StatelessWidget {
-  final Map<String, dynamic> weatherData;
-  const StatsCard({super.key, required this.weatherData});
+  final Map<String, dynamic>? weatherData; // Make weatherData nullable
+  const StatsCard({super.key, this.weatherData}); // Update constructor
 
   @override
   Widget build(BuildContext context) {
+    final bool isLoading = weatherData == null;
+
+    // Helper to safely get data or return null if loading
+    T? getData<T>(String key, [T? defaultValue]) {
+      if (isLoading || weatherData![key] == null) return defaultValue;
+      return weatherData![key] as T;
+    }
+
+    // Helper for conditional values
+    dynamic getValue(dynamic loadingValue, dynamic loadedValueCallback()) {
+        return isLoading ? loadingValue : loadedValueCallback();
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(
+      child: Row( // Or your GridView implementation
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Stat(
-              icon: Icons.thermostat,
-              label: "Temperature",
-              value: "${weatherData['temperature']}°C",
-              color:
-                  weatherData['temperature'] > 35 ? Colors.red : Colors.blue),
+            icon: Icons.thermostat,
+            label: "Temperature",
+            value: getValue(null, () => "${weatherData!['temperature']}°C"),
+            color: getValue(Colors.grey, () => weatherData!['temperature'] > 35 ? Colors.red : Colors.blue),
+          ),
           Stat(
-              icon: Icons.water_drop,
-              label: "Humidity",
-              value: "${weatherData['humidity']}%",
-              color: weatherData['humidity'] >= 80
-                  ? Colors.red
-                  : weatherData['humidity'] <= 40
-                      ? Colors.black
-                      : Colors.blue),
+            icon: Icons.water_drop,
+            label: "Humidity",
+            value: getValue(null, () => "${weatherData!['humidity']}%"),
+            color: getValue(Colors.grey, () => weatherData!['humidity'] >= 80
+                ? Colors.red
+                : weatherData!['humidity'] <= 40
+                    ? Colors.black
+                    : Colors.blue),
+          ),
           Stat(
-              icon: weatherData['rainSensor'] == 1
-                  ? Icons.cloudy_snowing
-                  : Icons.cloud,
-              label: "Rain",
-              value: weatherData['rainSensor'] == 1 ? "Rain" : "No Rain",
-              color:
-                  weatherData['rainSensor'] == 1 ? Colors.blue : Colors.black),
+            icon: getValue(Icons.cloud_outlined, () => weatherData!['rainSensor'] == 1 ? Icons.cloudy_snowing : Icons.cloud),
+            label: "Rain",
+            value: getValue(null, () => weatherData!['rainSensor'] == 1 ? "Rain" : "No Rain"),
+            color: getValue(Colors.grey, () => weatherData!['rainSensor'] == 1 ? Colors.blue : Colors.black),
+          ),
           Stat(
-              icon: Icons.waves,
-              label: "Water Lvl.",
-              value: "${weatherData['waterLevel']} cm",
-              color: weatherData['waterLevel'] > 0
-                  ? Colors.blueAccent
-                  : Colors.black),
+            icon: Icons.waves,
+            label: "Water Lvl.",
+            value: getValue(null, () => "${weatherData!['waterLevel']} cm"),
+            color: getValue(Colors.grey, () => weatherData!['waterLevel'] > 0 ? Colors.blueAccent : Colors.black),
+          ),
         ],
       ),
     );
@@ -123,15 +135,16 @@ class StatsCard extends StatelessWidget {
 class Stat extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String value;
+  final String? value; // Make value nullable
   final Color color;
 
-  const Stat(
-      {super.key,
-      required this.icon,
-      required this.label,
-      required this.value,
-      required this.color});
+  const Stat({
+    super.key,
+    required this.icon,
+    required this.label,
+    this.value, // Update constructor: value is now optional
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -145,19 +158,38 @@ class Stat extends StatelessWidget {
           BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1)
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16), // Consider reducing padding if content is small
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center, // Center items horizontally
         children: [
           Icon(icon, color: color, size: 28),
           const SizedBox(height: 8),
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(label,
+          if (value != null)
+            Text(
+              value!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 8, color: Colors.grey)),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            )
+          else
+            SizedBox( // Constrain the size of the progress indicator
+              height: 14, // Approximate height of the text
+              width: 14,  // Approximate width of the text
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0, // Make it a bit thinner
+                valueColor: AlwaysStoppedAnimation<Color>(color), // Use the stat's color
+              ),
+            ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 10, color: Colors.grey[600]), // Slightly increased label size
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -211,7 +243,7 @@ class _MapCardState extends State<MapCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(30),
       child: Container(
         height: MediaQuery.of(context).size.height * 0.4,
         decoration: BoxDecoration(
@@ -227,70 +259,72 @@ class _MapCardState extends State<MapCard> {
                 borderRadius: BorderRadius.circular(12),
                 child: Stack(
                   children: [
-                    FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: _currentPosition,
-                        initialRotation: 50,
-                        initialZoom: 14.7,
-                        maxZoom: 20.5,
-                        minZoom: 11.0,
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                    IgnorePointer(
+                      child: FlutterMap(
+                        mapController: _mapController,
+                        options: MapOptions(
+                          initialCenter: _currentPosition,
+                          initialRotation: 50,
+                          initialZoom: 14.7,
+                          maxZoom: 20.5,
+                          minZoom: 11.0,
                         ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: LatLng(_currentPosition.latitude,
-                                  _currentPosition.longitude),
-                              child: const Icon(
-                                Icons.location_pin,
-                                color: Colors.red,
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: LatLng(_currentPosition.latitude,
+                                    _currentPosition.longitude),
+                                child: const Icon(
+                                  Icons.location_pin,
+                                  color: Colors.red,
+                                ),
                               ),
-                            ),
-                            const Marker(
-                              point: LatLng(10.865162, 122.738167),
-                              child: Icon(Icons.sensors, color: Colors.red),
-                            ),
-                            const Marker(
-                              point: LatLng(10.857623, 122.731182),
-                              child: Icon(Icons.sensors, color: Colors.red),
-                            ),
-                            const Marker(
-                              point: LatLng(10.855813, 122.741552),
-                              child: Icon(Icons.sensors, color: Colors.red),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Positioned(
-                      bottom: 75,
-                      right: 10,
-                      child: FloatingActionButton(
-                        onPressed: _zoomIn,
-                        backgroundColor: Colors.white,
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.black,
-                        ),
+                              const Marker(
+                                point: LatLng(10.865162, 122.738167),
+                                child: Icon(Icons.sensors, color: Colors.red),
+                              ),
+                              const Marker(
+                                point: LatLng(10.857623, 122.731182),
+                                child: Icon(Icons.sensors, color: Colors.red),
+                              ),
+                              const Marker(
+                                point: LatLng(10.855813, 122.741552),
+                                child: Icon(Icons.sensors, color: Colors.red),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      bottom: 10,
-                      right: 10,
-                      child: FloatingActionButton(
-                        onPressed: _zoomOut,
-                        backgroundColor: Colors.white,
-                        child: const Icon(
-                          Icons.remove,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
+                    // Positioned(
+                    //   bottom: 75,
+                    //   right: 10,
+                    //   child: FloatingActionButton(
+                    //     onPressed: _zoomIn,
+                    //     backgroundColor: Colors.white,
+                    //     child: const Icon(
+                    //       Icons.add,
+                    //       color: Colors.black,
+                    //     ),
+                    //   ),
+                    // ),
+                    // Positioned(
+                    //   bottom: 10,
+                    //   right: 10,
+                    //   child: FloatingActionButton(
+                    //     onPressed: _zoomOut,
+                    //     backgroundColor: Colors.white,
+                    //     child: const Icon(
+                    //       Icons.remove,
+                    //       color: Colors.black,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 )),
       ),
