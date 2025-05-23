@@ -11,9 +11,9 @@ class WeatherCalendarScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => WeatherCalendarViewModel(),
-      child: Scaffold(
+      child: const Scaffold(
         backgroundColor: Colors.transparent,
-        body: const SingleChildScrollView(
+        body: SingleChildScrollView(
           physics: BouncingScrollPhysics(),
           child: Column(
             children: [

@@ -49,7 +49,7 @@ class PlantingDateCard extends StatelessWidget {
           ),
           Card(
             clipBehavior: Clip.antiAlias,
-            child: Container(
+            child: SizedBox(
               height: 250,
               child: Consumer<WeatherCalendarViewModel>(
                 builder: (context, viewModel, child) {
