@@ -43,36 +43,140 @@ class PatubigApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
-        ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
-        ChangeNotifierProvider(create: (_) => WeatherViewModel()),
-      ],
-      child: MaterialApp(
-        title: 'Patubig',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF2E7D32),
-            brightness: Brightness.light,
-          ),
-          cardTheme: CardTheme(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
+          ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
+          ChangeNotifierProvider(create: (_) => WeatherViewModel()),
+        ],
+        child: MaterialApp(
+          title: 'Patubig',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            // Define your green and white color scheme
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF2E7D32), // A strong agricultural green
+              brightness: Brightness.light,
+              primary:
+                  const Color(0xFF2E7D32), // Darker green for primary elements
+              onPrimary: Colors.white, // White text/icons on primary green
+              primaryContainer:
+                  const Color(0xFFD4E8D3), // Lighter green for containers
+              onPrimaryContainer: const Color(
+                  0xFF1B5E20), // Darker text on light green containers
+              secondary: const Color(
+                  0xFF6B9C56), // Another shade of green for secondary elements
+              onSecondary: Colors.white,
+              tertiary:
+                  const Color(0xFFA5D6A7), // Even lighter green for tertiary
+              onTertiary: const Color(0xFF2E7D32),
+              background: Colors.white, // Pure white background
+              onBackground: Colors.black87, // Dark text on white background
+              surface: Colors.white, // White surface for cards, dialogs
+              onSurface: Colors.black87,
+              error: Colors.red.shade700, // Standard error color
+              onError: Colors.white,
             ),
+
+            // Explicitly set scaffold background to white for consistency
+            scaffoldBackgroundColor: Colors.white,
+
+            // Customize AppBarTheme for the green and white look
+            appBarTheme: const AppBarTheme(
+              centerTitle: true,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              backgroundColor:
+                  Color(0xFF2E7D32), // Your strong agricultural green
+              foregroundColor:
+                  Colors.white, // White text and icons on the AppBar
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            // Customize CardTheme as you already have, ensure it works with the scheme
+            cardTheme: CardTheme(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              color: Colors.white, // Ensure cards are white
+              surfaceTintColor: Colors
+                  .transparent, // To prevent Material 3 tinting if not desired
+            ),
+
+            // Customize ElevatedButtonTheme for green buttons with white text
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(
+                    0xFF4CAF50), // A slightly brighter green for buttons
+                foregroundColor: Colors.white, // White text on the green button
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // Customize TextButtonTheme for green text links
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor:
+                    const Color(0xFF1B5E20), // Darker green for text buttons
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            // Customize InputDecorationTheme for text form fields
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: Colors
+                  .grey.shade50, // A very light grey background for text fields
+              labelStyle:
+                  const TextStyle(color: Color(0xFF2E7D32)), // Green label
+              hintStyle:
+                  TextStyle(color: Colors.grey.shade600), // Grey hint text
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                    color: Color(0xFF2E7D32),
+                    width: 2), // Green border when focused
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            ),
+
+            visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-          ),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const AuthGate(),
-      ),
-    );
+          home: const AuthGate(),
+        ));
   }
 }
 
@@ -137,7 +241,7 @@ class _MainScreenState extends State<MainScreen> {
                 const SizedBox(height: 16),
                 const UserProfileCard(),
                 const SizedBox(height: 8),
-                Container(
+                SizedBox(
                   height: MediaQuery.of(context).size.height * 0.7,
                   child: _pages[_selectedIndex],
                 ),

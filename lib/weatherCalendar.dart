@@ -30,9 +30,9 @@ class WeatherCalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.transparent,
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -439,7 +439,7 @@ class _PlantingDateCardState extends State<PlantingDateCard> {
           ),
           Card(
             clipBehavior: Clip.antiAlias,
-            child: Container(
+            child: SizedBox(
               height: 250,
               child: Stack(
                 children: [
