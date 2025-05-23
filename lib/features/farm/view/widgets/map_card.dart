@@ -17,20 +17,12 @@ class _MapCardState extends State<MapCard> {
     return Consumer<FarmWeatherViewModel>(
       builder: (context, viewModel, child) {
         return Padding(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(0),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.4,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 4, spreadRadius: 1)
-              ],
-            ),
+            height: MediaQuery.of(context).size.height * 1,
             child: viewModel.currentLocation == null
                 ? const Center(child: CircularProgressIndicator())
                 : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
                     child: Stack(
                       children: [
                         IgnorePointer(

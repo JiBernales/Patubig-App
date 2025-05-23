@@ -16,7 +16,7 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -27,7 +27,6 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
                   return StatsCard(weatherData: viewModel.weatherData?.toMap());
                 },
               ),
-              const MapCard(),
             ],
           ),
         ),

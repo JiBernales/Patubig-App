@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:patubig_app/features/farm/view/weather_stats_screen.dart';
+import 'package:patubig_app/features/weather/view/planting_calendar_screen.dart';
 import 'package:patubig_app/firebase_options.dart';
 import 'package:provider/provider.dart';
 
 import 'core/services/firebase_service.dart';
 import 'core/utils/constants.dart';
+import 'features/farm/view/widgets/map_card.dart';
 import 'features/farm/viewmodel/farm_viewmodel.dart';
 import 'features/weather/view/weather_calendar_screen.dart';
 import 'features/weather/viewmodel/weather_viewmodel.dart';
@@ -69,6 +71,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     const WeatherStatsScreen(),
     const WeatherCalendarScreen(),
+    // const PlantingCalendarScreen()
   ];
 
   void _onItemTapped(int index) {
@@ -81,87 +84,112 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAF9),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Colors.white,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                "Patubig Farm Monitor",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                ),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                    ],
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: const MapCard(),
+          ),
+            /*CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: MediaQuery.of(context).size.height * 0.1,
+                floating: false,
+                pinned: true,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                flexibleSpace: FlexibleSpaceBar(
+                  title: const Text(
+                    "Patubig Farm Monitor",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
                   ),
+                  background: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                const UserProfileCard(),
-                const SizedBox(height: 8),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: _pages[_selectedIndex],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            backgroundColor: Colors.white,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: Colors.grey.shade600,
-            type: BottomNavigationBarType.fixed,
-            elevation: 0,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_rounded),
-                activeIcon: Icon(Icons.dashboard_rounded),
-                label: 'Dashboard',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.cloud_queue_rounded),
-                activeIcon: Icon(Icons.cloud_queue_rounded),
-                label: 'Weather',
               ),
             ],
+          ),*/
+          DraggableScrollableSheet(
+            initialChildSize: 0.4,
+            minChildSize: 0.2,
+            maxChildSize: 0.8,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: NavigationBar(
+                        elevation: 0,
+                        selectedIndex: _selectedIndex,
+                        onDestinationSelected: _onItemTapped,
+                        backgroundColor: Colors.white,
+                        indicatorColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        height: 80,
+                        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                        destinations: const [
+                          NavigationDestination(
+                            icon: Icon(Icons.dashboard_outlined, size: 28),
+                            selectedIcon: Icon(Icons.dashboard_rounded, size: 30),
+                            label: 'SENSOR',
+                          ),
+                          NavigationDestination(
+                            icon: Icon(Icons.cloud_queue_outlined, size: 28),
+                            selectedIcon: Icon(Icons.cloud_rounded, size: 30),
+                            label: 'PANAHON',
+                          ),
+                        ],
+                      )
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: _pages[_selectedIndex],
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        ),
-      ),
+        ],
+      )
+
     );
   }
 }

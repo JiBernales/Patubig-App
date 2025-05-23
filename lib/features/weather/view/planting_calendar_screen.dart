@@ -4,8 +4,8 @@ import '../viewmodel/weather_calendar_viewmodel.dart';
 import 'widgets/weather_forecast_card.dart';
 import 'widgets/planting_date_card.dart';
 
-class WeatherCalendarScreen extends StatelessWidget {
-  const WeatherCalendarScreen({super.key});
+class PlantingCalendarScreen extends StatelessWidget {
+  const PlantingCalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class WeatherCalendarScreen extends StatelessWidget {
           physics: BouncingScrollPhysics(),
           child: Column(
             children: [
-              WeatherForecastCard(),
+              PlantingDateCard(),
             ],
           ),
         ),
