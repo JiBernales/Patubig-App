@@ -301,30 +301,6 @@ class _MapCardState extends State<MapCard> {
                         ],
                       ),
                     ),
-                    // Positioned(
-                    //   bottom: 75,
-                    //   right: 10,
-                    //   child: FloatingActionButton(
-                    //     onPressed: _zoomIn,
-                    //     backgroundColor: Colors.white,
-                    //     child: const Icon(
-                    //       Icons.add,
-                    //       color: Colors.black,
-                    //     ),
-                    //   ),
-                    // ),
-                    // Positioned(
-                    //   bottom: 10,
-                    //   right: 10,
-                    //   child: FloatingActionButton(
-                    //     onPressed: _zoomOut,
-                    //     backgroundColor: Colors.white,
-                    //     child: const Icon(
-                    //       Icons.remove,
-                    //       color: Colors.black,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 )),
       ),

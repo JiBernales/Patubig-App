@@ -1,21 +1,62 @@
+// features/farm/viewmodel/weather_viewmodel.dart
 import 'package:flutter/material.dart';
-import '../model/farm_model.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import '../model/weather_model.dart';
+import '../model/location_model.dart';
+import '../../../core/services/firebase_farm_service.dart';
+import '../../../core/services/location_service.dart';
 
-class FarmViewModel extends ChangeNotifier {
-  bool isLoading = true;
-  List<FarmModel> farms = [];
+class FarmWeatherViewModel extends ChangeNotifier {
+  WeatherModel? _weatherData;
+  LocationModel? _currentLocation;
+  late MapController _mapController;
 
-  FarmViewModel() {
-    fetchFarms();
+  WeatherModel? get weatherData => _weatherData;
+  LocationModel? get currentLocation => _currentLocation;
+  MapController get mapController => _mapController;
+
+  FarmWeatherViewModel() {
+    _mapController = MapController();
+    _currentLocation = LocationModel(latitude: 10.858355, longitude: 122.737857);
+    _initializeData();
   }
 
-  Future<void> fetchFarms() async {
-    await Future.delayed(const Duration(seconds: 1)); // Simulated fetch
-    farms = [
-      FarmModel(name: 'Farm A', location: 'Dumangas'),
-      FarmModel(name: 'Farm B', location: 'Iloilo City'),
-    ];
-    isLoading = false;
-    notifyListeners();
+  void _initializeData() {
+    _fetchWeatherData();
+    _loadLocation();
   }
+
+  void _fetchWeatherData() {
+    FirebaseService.getWeatherDataStream().listen((WeatherModel? data) {
+      _weatherData = data;
+      notifyListeners();
+    });
+  }
+
+  Future<void> _loadLocation() async {
+    try {
+      LocationModel location = await LocationService.getCurrentLocation();
+      _currentLocation = location;
+      notifyListeners();
+    } catch (e) {
+      print('Error loading location: $e');
+    }
+  }
+
+  void zoomIn() {
+    if (_currentLocation != null) {
+      double currentZoom = _mapController.camera.zoom;
+      _mapController.move(_currentLocation!.latLng, currentZoom + 0.5);
+    }
+  }
+
+  void zoomOut() {
+    if (_currentLocation != null) {
+      double currentZoom = _mapController.camera.zoom;
+      _mapController.move(_currentLocation!.latLng, currentZoom - 0.5);
+    }
+  }
+
+  void centerOnMarker() {}
 }

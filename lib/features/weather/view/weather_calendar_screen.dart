@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/weather_viewmodel.dart';
+import '../viewmodel/weather_calendar_viewmodel.dart';
+import 'widgets/weather_forecast_card.dart';
+import 'widgets/planting_date_card.dart';
 
 class WeatherCalendarScreen extends StatelessWidget {
   const WeatherCalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<WeatherViewModel>(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weather Calendar'),
+    return ChangeNotifierProvider(
+      create: (context) => WeatherCalendarViewModel(),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: const SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              WeatherForecastCard(),
+              SizedBox(height: 16),
+              PlantingDateCard(),
+            ],
+          ),
+        ),
       ),
-      body: viewModel.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: viewModel.weatherData.length,
-              itemBuilder: (context, index) {
-                final weather = viewModel.weatherData[index];
-                return ListTile(
-                  title: Text(weather.date ?? 'Unknown Date'),
-                  subtitle: Text('Temp: ${weather.temperature}°C'),
-                );
-              },
-            ),
     );
   }
 }
