@@ -46,14 +46,19 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
   }
 
   void _fetchData() {
-    _databaseRef.onValue.listen((DatabaseEvent event) {
+    _databaseRef.orderByKey().limitToLast(1).onValue.listen((DatabaseEvent event) {
       if (event.snapshot.value != null) {
+        final Map<String, dynamic> readings =
+        Map<String, dynamic>.from(event.snapshot.value as Map);
+
+        final latestReading = readings.values.first as Map;
         setState(() {
-          _weatherData = Map<String, dynamic>.from(event.snapshot.value as Map);
+          _weatherData = Map<String, dynamic>.from(latestReading);
         });
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +69,7 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               StatsCard(weatherData: _weatherData),
               const MapCard(),
             ],
@@ -95,24 +101,24 @@ class StatsCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row( // Or your GridView implementation
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Stat(
             icon: Icons.thermostat,
-            label: "Temperature",
+            label: "Temp.",
             value: getValue(null, () => "${weatherData!['temperature']}°C"),
             color: getValue(Colors.grey, () => weatherData!['temperature'] > 35 ? Colors.red : Colors.blue),
           ),
           Stat(
             icon: Icons.water_drop,
             label: "Humidity",
-            value: getValue(null, () => "${weatherData!['humidity']}%"),
+            value: getValue(null, () => "${weatherData!['humidity']?.toStringAsFixed(2)}%"),
             color: getValue(Colors.grey, () => weatherData!['humidity'] >= 80
                 ? Colors.red
                 : weatherData!['humidity'] <= 40
-                    ? Colors.black
-                    : Colors.blue),
+                ? Colors.black
+                : Colors.blue),
           ),
           Stat(
             icon: getValue(Icons.cloud_outlined, () => weatherData!['rainSensor'] == 1 ? Icons.cloudy_snowing : Icons.cloud),
@@ -123,7 +129,7 @@ class StatsCard extends StatelessWidget {
           Stat(
             icon: Icons.waves,
             label: "Water Lvl.",
-            value: getValue(null, () => "${weatherData!['waterLevel']} cm"),
+            value: getValue(null, () => "${((weatherData!['waterLevel'] ?? 0) * 100).toStringAsFixed(2)}%"),
             color: getValue(Colors.grey, () => weatherData!['waterLevel'] > 0 ? Colors.blueAccent : Colors.black),
           ),
         ],

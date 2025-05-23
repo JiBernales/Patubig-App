@@ -27,14 +27,14 @@ class StatsCard extends StatelessWidget {
         children: [
           Stat(
             icon: Icons.thermostat,
-            label: "Temperature",
+            label: "Temp.",
             value: getValue(null, () => "${weatherData!['temperature']}°C"),
             color: getValue(Colors.grey, () => weatherData!['temperature'] > 35 ? Colors.red : Colors.blue),
           ),
           Stat(
             icon: Icons.water_drop,
             label: "Humidity",
-            value: getValue(null, () => "${weatherData!['humidity']}%"),
+            value: getValue(null, () => "${weatherData!['humidity']?.toStringAsFixed(2)}%"),
             color: getValue(Colors.grey, () => weatherData!['humidity'] >= 80
                 ? Colors.red
                 : weatherData!['humidity'] <= 40
@@ -50,7 +50,7 @@ class StatsCard extends StatelessWidget {
           Stat(
             icon: Icons.waves,
             label: "Water Lvl.",
-            value: getValue(null, () => "${weatherData!['waterLevel']} cm"),
+            value: getValue(null, () => weatherData!['waterLevel'] > 0 ? "${((weatherData!['waterLevel'] ?? 0) * 100).toStringAsFixed(2)}%": "0%"),
             color: getValue(Colors.grey, () => weatherData!['waterLevel'] > 0 ? Colors.blueAccent : Colors.black),
           ),
         ],
