@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:patubig_app/core/services/auth_service.dart';
+import 'package:patubig_app/features/auth/view/login_screen.dart';
 import 'package:patubig_app/features/farm/view/weather_stats_screen.dart';
 import 'package:patubig_app/firebase_options.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +11,23 @@ import 'core/utils/constants.dart';
 import 'features/farm/viewmodel/farm_viewmodel.dart';
 import 'features/weather/view/weather_calendar_screen.dart';
 import 'features/weather/viewmodel/weather_viewmodel.dart';
+import 'features/auth/viewmodel/auth_viewmodel.dart';
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthViewModel>(
+      builder: (_, authVm, __) {
+        // Show the dashboard when already authenticated.
+        if (authVm.user != null) return const MainScreen();
+        // Otherwise fall back to Login.
+        return const LoginScreen();
+      },
+    );
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +44,7 @@ class PatubigApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
         ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
         ChangeNotifierProvider(create: (_) => WeatherViewModel()),
       ],
@@ -50,7 +70,7 @@ class PatubigApp extends StatelessWidget {
           ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: const MainScreen(),
+        home: const AuthGate(),
       ),
     );
   }
@@ -204,19 +224,31 @@ class _UserProfileCardState extends State<UserProfileCard> {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Kristan Jay Gabay",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
+                    Consumer<AuthViewModel>(
+                      builder: (_, authVm, __) {
+                        final user = authVm.user;
+
+                        // Prefer the saved full name.  Fallbacks only if nothing was stored.
+                        final fullName = user?.displayName?.trim();
+                        final label = (fullName != null && fullName.isNotEmpty)
+                            ? fullName
+                            : 'Bagong Magsasaka'; // or use user?.phoneNumber
+
+                        return Text(
+                          label,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        );
+                      },
                     ),
-                    SizedBox(height: 4),
-                    Text(
+                    const SizedBox(height: 4),
+                    const Text(
                       "PD Monfort North, Dumangas",
                       style: TextStyle(
                         color: Colors.grey,
