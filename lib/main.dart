@@ -125,10 +125,12 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 child: ListView(
                   controller: scrollController,
+                  padding: EdgeInsetsGeometry.only(top: MediaQuery.of(context).size.height*0.025),
                   children: [
+                    UserProfileCard(),
                     Center(
                       child: Container(
-                        width: 40,
+                        width: MediaQuery.of(context).size.width*0.15,
                         height: 5,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
@@ -138,15 +140,15 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.grey,
                         ),
+                        padding: EdgeInsetsGeometry.all(0),
                         child: NavigationBar(
                           elevation: 0,
                           selectedIndex: _selectedIndex,
                           onDestinationSelected: _onItemTapped,
                           backgroundColor: Colors.white,
                           shadowColor: Colors.white,
-                          height: MediaQuery.of(context).size.height * 0.075,
                           indicatorColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
                           destinations: const [
@@ -195,81 +197,65 @@ class _UserProfileCardState extends State<UserProfileCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.secondary,
-                    ],
+      child: Padding(
+        padding: EdgeInsetsGeometry.only(bottom: MediaQuery.of(context).size.height*0.015, left: MediaQuery.of(context).size.width*0.1, right: MediaQuery.of(context).size.width*0.1),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Consumer<AuthViewModel>(
+                    builder: (_, authVm, __) {
+                      final user = authVm.user;
+
+                      // Prefer the saved full name.  Fallbacks only if nothing was stored.
+                      final fullName = user?.displayName?.trim();
+                      final label = (fullName != null && fullName.isNotEmpty)
+                          ? fullName
+                          : 'Bagong Magsasaka'; // or use user?.phoneNumber
+
+                      return Text(
+                        label,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      );
+                    },
                   ),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  radius: 28,
-                  child: Icon(
-                    Icons.person_rounded,
-                    color: Colors.white,
-                    size: 28,
+                  SizedBox(height: MediaQuery.of(context).size.height*0.0025),
+                  const Text(
+                    "PD Monfort North, Dumangas",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Consumer<AuthViewModel>(
-                      builder: (_, authVm, __) {
-                        final user = authVm.user;
-
-                        // Prefer the saved full name.  Fallbacks only if nothing was stored.
-                        final fullName = user?.displayName?.trim();
-                        final label = (fullName != null && fullName.isNotEmpty)
-                            ? fullName
-                            : 'Bagong Magsasaka'; // or use user?.phoneNumber
-
-                        return Text(
-                          label,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "PD Monfort North, Dumangas",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                    ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.secondary,
                   ],
                 ),
+                borderRadius: BorderRadius.circular(30),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(8),
+              child: const CircleAvatar(
+                backgroundColor: Colors.transparent,
+                radius: 28,
                 child: Icon(
-                  Icons.notifications_rounded,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
+                  Icons.person_rounded,
+                  color: Colors.white,
+                  size: 28,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
