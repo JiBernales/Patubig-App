@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:patubig_app/core/services/auth_service.dart';
+import 'package:patubig_app/features/auth/view/login_screen.dart';
 import 'package:patubig_app/features/farm/view/weather_stats_screen.dart';
 import 'package:patubig_app/firebase_options.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +11,23 @@ import 'core/utils/constants.dart';
 import 'features/farm/viewmodel/farm_viewmodel.dart';
 import 'features/weather/view/weather_calendar_screen.dart';
 import 'features/weather/viewmodel/weather_viewmodel.dart';
+import 'features/auth/viewmodel/auth_viewmodel.dart';
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthViewModel>(
+      builder: (_, authVm, __) {
+        // Show the dashboard when already authenticated.
+        if (authVm.user != null) return const MainScreen();
+        // Otherwise fall back to Login.
+        return const LoginScreen();
+      },
+    );
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,17 +61,106 @@ class PatubigApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
+
+            // Explicitly set scaffold background to white for consistency
+            scaffoldBackgroundColor: Colors.white,
+
+            // Customize AppBarTheme for the green and white look
+            appBarTheme: const AppBarTheme(
+              centerTitle: true,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              backgroundColor:
+                  Color(0xFF2E7D32), // Your strong agricultural green
+              foregroundColor:
+                  Colors.white, // White text and icons on the AppBar
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            // Customize CardTheme as you already have, ensure it works with the scheme
+            cardTheme: CardTheme(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              color: Colors.white, // Ensure cards are white
+              surfaceTintColor: Colors
+                  .transparent, // To prevent Material 3 tinting if not desired
+            ),
+
+            // Customize ElevatedButtonTheme for green buttons with white text
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(
+                    0xFF4CAF50), // A slightly brighter green for buttons
+                foregroundColor: Colors.white, // White text on the green button
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            // Customize TextButtonTheme for green text links
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor:
+                    const Color(0xFF1B5E20), // Darker green for text buttons
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            // Customize InputDecorationTheme for text form fields
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: Colors
+                  .grey.shade50, // A very light grey background for text fields
+              labelStyle:
+                  const TextStyle(color: Color(0xFF2E7D32)), // Green label
+              hintStyle:
+                  TextStyle(color: Colors.grey.shade600), // Grey hint text
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade400),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                    color: Color(0xFF2E7D32),
+                    width: 2), // Green border when focused
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            ),
+
+            visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-          ),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const MainScreen(),
-      ),
-    );
+          home: const AuthGate(),
+        ));
   }
 }
 
@@ -117,7 +225,7 @@ class _MainScreenState extends State<MainScreen> {
                 const SizedBox(height: 16),
                 const UserProfileCard(),
                 const SizedBox(height: 8),
-                Container(
+                SizedBox(
                   height: MediaQuery.of(context).size.height * 0.7,
                   child: _pages[_selectedIndex],
                 ),
@@ -204,19 +312,31 @@ class _UserProfileCardState extends State<UserProfileCard> {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Kristan Jay Gabay",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
+                    Consumer<AuthViewModel>(
+                      builder: (_, authVm, __) {
+                        final user = authVm.user;
+
+                        // Prefer the saved full name.  Fallbacks only if nothing was stored.
+                        final fullName = user?.displayName?.trim();
+                        final label = (fullName != null && fullName.isNotEmpty)
+                            ? fullName
+                            : 'Bagong Magsasaka'; // or use user?.phoneNumber
+
+                        return Text(
+                          label,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        );
+                      },
                     ),
-                    SizedBox(height: 4),
-                    Text(
+                    const SizedBox(height: 4),
+                    const Text(
                       "PD Monfort North, Dumangas",
                       style: TextStyle(
                         color: Colors.grey,

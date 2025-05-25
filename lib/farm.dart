@@ -95,7 +95,7 @@ class StatsCard extends StatelessWidget {
     }
 
     // Helper for conditional values
-    dynamic getValue(dynamic loadingValue, dynamic loadedValueCallback()) {
+    dynamic getValue(dynamic loadingValue, dynamic Function() loadedValueCallback) {
         return isLoading ? loadingValue : loadedValueCallback();
     }
 

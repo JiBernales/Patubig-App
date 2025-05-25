@@ -17,3 +17,6 @@ class AppRoutes {
   static const farm = '/';
   static const weather = '/weather';
 }
+
+/// Internal suffix so `0917…` becomes a valid e-mail for Firebase.
+const String kPhoneEmailDomain = '@patubig.app';
