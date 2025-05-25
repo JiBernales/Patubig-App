@@ -17,9 +17,9 @@ class _MapCardState extends State<MapCard> {
     return Consumer<FarmWeatherViewModel>(
       builder: (context, viewModel, child) {
         return Padding(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(0),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.4,
+            height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),

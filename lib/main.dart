@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'core/services/firebase_service.dart';
 import 'core/utils/constants.dart';
+import 'features/farm/view/widgets/map_card.dart';
 import 'features/farm/viewmodel/farm_viewmodel.dart';
 import 'features/weather/view/weather_calendar_screen.dart';
 import 'features/weather/viewmodel/weather_viewmodel.dart';
@@ -24,6 +25,7 @@ class AuthGate extends StatelessWidget {
         if (authVm.user != null) return const MainScreen();
         // Otherwise fall back to Login.
         return const LoginScreen();
+        // return const MainScreen();
       },
     );
   }
@@ -44,6 +46,7 @@ class PatubigApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
         ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
         ChangeNotifierProvider(create: (_) => WeatherViewModel()),
       ],
@@ -61,106 +64,17 @@ class PatubigApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-
-            // Explicitly set scaffold background to white for consistency
-            scaffoldBackgroundColor: Colors.white,
-
-            // Customize AppBarTheme for the green and white look
-            appBarTheme: const AppBarTheme(
-              centerTitle: true,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              backgroundColor:
-                  Color(0xFF2E7D32), // Your strong agricultural green
-              foregroundColor:
-                  Colors.white, // White text and icons on the AppBar
-              titleTextStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            // Customize CardTheme as you already have, ensure it works with the scheme
-            cardTheme: CardTheme(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              color: Colors.white, // Ensure cards are white
-              surfaceTintColor: Colors
-                  .transparent, // To prevent Material 3 tinting if not desired
-            ),
-
-            // Customize ElevatedButtonTheme for green buttons with white text
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(
-                    0xFF4CAF50), // A slightly brighter green for buttons
-                foregroundColor: Colors.white, // White text on the green button
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            // Customize TextButtonTheme for green text links
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor:
-                    const Color(0xFF1B5E20), // Darker green for text buttons
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-
-            // Customize InputDecorationTheme for text form fields
-            inputDecorationTheme: InputDecorationTheme(
-              filled: true,
-              fillColor: Colors
-                  .grey.shade50, // A very light grey background for text fields
-              labelStyle:
-                  const TextStyle(color: Color(0xFF2E7D32)), // Green label
-              hintStyle:
-                  TextStyle(color: Colors.grey.shade600), // Grey hint text
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade400),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(
-                    color: Color(0xFF2E7D32),
-                    width: 2), // Green border when focused
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.red.shade700, width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            ),
-
-            visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          home: const AuthGate(),
-        ));
+          appBarTheme: const AppBarTheme(
+            centerTitle: true,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+          ),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: const AuthGate(),
+      ),
+    );
   }
 }
 
@@ -189,87 +103,83 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAF9),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Colors.white,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                "Patubig Farm Monitor",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 20,
-                ),
-              ),
-              background: Container(
+      body: Stack(
+        children: [
+          const MapCard(),
+          DraggableScrollableSheet(
+            initialChildSize: 0.3,
+            minChildSize: 0.2,
+            maxChildSize: 0.7,
+            builder: (context, scrollController) {
+              return Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                    ],
-                  ),
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                const UserProfileCard(),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: _pages[_selectedIndex],
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        child: NavigationBar(
+                          elevation: 0,
+                          selectedIndex: _selectedIndex,
+                          onDestinationSelected: _onItemTapped,
+                          backgroundColor: Colors.white,
+                          shadowColor: Colors.white,
+                          height: MediaQuery.of(context).size.height * 0.075,
+                          indicatorColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                          destinations: const [
+                            NavigationDestination(
+                              icon: Icon(Icons.sensors_outlined),
+                              selectedIcon: Icon(Icons.sensors_rounded),
+                              label: 'MGA SENSOR',
+                            ),
+                            NavigationDestination(
+                              icon: Icon(Icons.cloud_queue_outlined),
+                              selectedIcon: Icon(Icons.cloud_rounded),
+                              label: 'PANAHON',
+                            ),
+                            /*NavigationDestination(
+                            icon: Icon(Icons.eco_outlined),
+                            selectedIcon: Icon(Icons.eco_rounded),
+                            label: 'Pagtanum',
+                          ),*/
+                          ],
+                        )
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: _pages[_selectedIndex],
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ],
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          child: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            backgroundColor: Colors.white,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: Colors.grey.shade600,
-            type: BottomNavigationBarType.fixed,
-            elevation: 0,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_rounded),
-                activeIcon: Icon(Icons.dashboard_rounded),
-                label: 'Dashboard',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.cloud_queue_rounded),
-                activeIcon: Icon(Icons.cloud_queue_rounded),
-                label: 'Weather',
-              ),
-            ],
-          ),
-        ),
-      ),
+      )
+
     );
   }
 }
