@@ -43,39 +43,23 @@ class PatubigApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
-          ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
-          ChangeNotifierProvider(create: (_) => WeatherViewModel()),
-        ],
-        child: MaterialApp(
-          title: 'Patubig',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            useMaterial3: true,
-            // Define your green and white color scheme
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF2E7D32), // A strong agricultural green
-              brightness: Brightness.light,
-              primary:
-                  const Color(0xFF2E7D32), // Darker green for primary elements
-              onPrimary: Colors.white, // White text/icons on primary green
-              primaryContainer:
-                  const Color(0xFFD4E8D3), // Lighter green for containers
-              onPrimaryContainer: const Color(
-                  0xFF1B5E20), // Darker text on light green containers
-              secondary: const Color(
-                  0xFF6B9C56), // Another shade of green for secondary elements
-              onSecondary: Colors.white,
-              tertiary:
-                  const Color(0xFFA5D6A7), // Even lighter green for tertiary
-              onTertiary: const Color(0xFF2E7D32),
-              background: Colors.white, // Pure white background
-              onBackground: Colors.black87, // Dark text on white background
-              surface: Colors.white, // White surface for cards, dialogs
-              onSurface: Colors.black87,
-              error: Colors.red.shade700, // Standard error color
-              onError: Colors.white,
+      providers: [
+        ChangeNotifierProvider(create: (_) => FarmWeatherViewModel()),
+        ChangeNotifierProvider(create: (_) => WeatherViewModel()),
+      ],
+      child: MaterialApp(
+        title: 'Patubig',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF2E7D32),
+            brightness: Brightness.light,
+          ),
+          cardTheme: CardThemeData(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
 
             // Explicitly set scaffold background to white for consistency

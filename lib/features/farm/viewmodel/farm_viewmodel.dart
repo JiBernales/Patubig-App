@@ -27,7 +27,8 @@ class FarmWeatherViewModel extends ChangeNotifier {
   }
 
   void _fetchWeatherData() {
-    FirebaseService.getWeatherDataStream().listen((WeatherModel? data) {
+    final firebaseService = FirebaseService();
+    firebaseService.getWeatherDataStream().listen((WeatherModel? data) {
       _weatherData = data;
       notifyListeners();
     });
