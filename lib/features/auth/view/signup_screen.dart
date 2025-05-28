@@ -137,11 +137,11 @@ class _SignupScreenState extends State<SignupScreen>
 
   Future<void> _handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
-    if (!_acceptTerms) {
-      _showErrorSnackBar(
-          'Kailangan mo munang tanggapin ang Terms and Conditions');
-      return;
-    }
+    // if (!_acceptTerms) {
+    //   _showErrorSnackBar(
+    //       'Kailangan mo munang tanggapin ang Terms and Conditions');
+    //   return;
+    // }
 
     final authVm = context.read<AuthViewModel>();
 

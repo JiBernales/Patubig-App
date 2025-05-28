@@ -34,6 +34,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       await _service.signUp(fullName, phone, password);
     } finally {
+      refreshUser();
       _setLoading(false);
     }
   }
@@ -43,5 +44,14 @@ class AuthViewModel extends ChangeNotifier {
   void _setLoading(bool value) {
     _loading = value;
     notifyListeners();
+  }
+
+  Future<void> refreshUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.reload();
+      _user = FirebaseAuth.instance.currentUser;
+      notifyListeners();
+    }
   }
 }
