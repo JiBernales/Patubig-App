@@ -16,6 +16,7 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _hasShownInsufficientWaterWarning = false; // <-- Add this flag
 
   // Instantiate FirebaseService
   final FirebaseService _firebaseService = FirebaseService();
@@ -415,11 +416,21 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
               }
 
               // Check if total CWR is less than virtual reservoir and show warning
-              if (reservoir != null && totalCWR > reservoir) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _showInsufficientWaterWarning(
-                      context, farmsInQueue, totalCWR, reservoir);
-                });
+              if (reservoir != null) {
+                if (totalCWR > reservoir) {
+                  if (!_hasShownInsufficientWaterWarning) {
+                    _hasShownInsufficientWaterWarning = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _showInsufficientWaterWarning(
+                          context, farmsInQueue, totalCWR, reservoir);
+                    });
+                  }
+                } else {
+                  // Reset flag if reservoir is sufficient again
+                  if (_hasShownInsufficientWaterWarning) {
+                    _hasShownInsufficientWaterWarning = false;
+                  }
+                }
               }
 
               // ---------- Build the overlay content ----------

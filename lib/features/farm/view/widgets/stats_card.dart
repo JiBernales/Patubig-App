@@ -270,7 +270,7 @@ class _StatsCardState extends State<StatsCard> with TickerProviderStateMixin {
                                   null,
                                   () => widget.weatherData!['waterLevel'] !=
                                           null
-                                      ? "${widget.weatherData!['waterLevel']?.toStringAsFixed(1)} cm"
+                                      ? "${widget.weatherData!['waterLevel']?.toStringAsFixed(1)} %"
                                       : "N/A"),
                               color: getValue(
                                   Colors.grey,
