@@ -66,7 +66,7 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
                 scale: _scaleAnimation,
                 child: Container(
                   height: MediaQuery.of(context).size.height,
-                  margin: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.all(0),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -112,42 +112,107 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
                                   children: [
                                     TileLayer(
                                       urlTemplate:
-                                          'https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+                                          'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                                      subdomains: const ['a', 'b', 'c', 'd'],
                                     ),
                                     MarkerLayer(
+                                      rotate: false,
                                       markers: [
-                                        Marker(
-                                          point:
-                                              viewModel.currentLocation!.latLng,
-                                          child: _buildAnimatedMarker(
-                                            Icons.location_pin,
-                                            Colors.red,
-                                            size: 32,
-                                            isPrimary: true,
-                                          ),
-                                        ),
+                                        // Marker(
+                                        //   point: LatLng(_currentPosition.latitude,
+                                        //       _currentPosition.longitude),
+                                        //   width: 60,
+                                        //   height: 60,
+                                        //   child: Column(
+                                        //     mainAxisSize: MainAxisSize.min,
+                                        //     children: const [
+                                        //       Icon(
+                                        //         Icons.location_pin,
+                                        //         color: Colors.red,
+                                        //         size: 40,
+                                        //       ),
+                                        //       Text(
+                                        //         "You",
+                                        //         style: TextStyle(
+                                        //             fontSize: 12,
+                                        //             fontWeight: FontWeight.bold),
+                                        //       ),
+                                        //     ],
+                                        //   ),
+                                        // ),
                                         Marker(
                                           point: const LatLng(
                                               10.865162, 122.738167),
-                                          child: _buildAnimatedMarker(
-                                            Icons.sensors,
-                                            Colors.green,
+                                          width: 60,
+                                          height: 60,
+                                          child: Transform.rotate(
+                                            angle:
+                                                -0.85, // in radians, e.g. 0.5 ~ 28.6°
+                                            child: const Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.sensors,
+                                                    color: Colors.green,
+                                                    size: 40),
+                                                Text(
+                                                  "Farm 002",
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         Marker(
                                           point: const LatLng(
                                               10.857623, 122.731182),
-                                          child: _buildAnimatedMarker(
-                                            Icons.sensors,
-                                            Colors.blue,
+                                          width: 60,
+                                          height: 60,
+                                          child: Transform.rotate(
+                                            angle:
+                                                -0.85, // in radians, e.g. 0.5 ~ 28.6°
+                                            child: const Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.sensors,
+                                                    color: Colors.blue,
+                                                    size: 40),
+                                                Text(
+                                                  "Farm 001",
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         Marker(
                                           point: const LatLng(
                                               10.855813, 122.741552),
-                                          child: _buildAnimatedMarker(
-                                            Icons.sensors,
-                                            Colors.orange,
+                                          width: 60,
+                                          height: 60,
+                                          child: Transform.rotate(
+                                            angle:
+                                                -0.85, // in radians, e.g. 0.5 ~ 28.6°
+                                            child: const Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.sensors,
+                                                    color: Colors.orange,
+                                                    size: 40),
+                                                Text(
+                                                  "Farm 003",
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -226,23 +291,28 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
       builder: (context, value, child) {
         return Transform.scale(
           scale: value,
-          child: Container(
-            padding: const EdgeInsets.all(0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: size,
+          child: Transform.rotate(
+            // ADD THIS Transform.rotate
+            angle:
+                0, // No rotation since MapController does not have a rotation property
+            child: Container(
+              padding: const EdgeInsets.all(0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: size,
+              ),
             ),
           ),
         );
@@ -292,70 +362,113 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
   }
 
   // NEW: Widget to display the irrigation queue
+// TOP-RIGHT overlay – queue + virtual-reservoir --------------------------------
   Widget _buildIrrigationQueueOverlay() {
+    // We nest two StreamBuilders so each piece (queue / reservoir) can refresh
+    // independently without writing extra boilerplate.  The outer one listens
+    // to the reservoir, the inner one to the queue.
     return Positioned(
-      top: 16,
-      right: 16,
-      child: StreamBuilder<Map<String, dynamic>?>(
-        stream: _firebaseService.getIrrigationQueueStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildQueueContainer(
-              children: [
-                _buildQueueItem(Icons.pending, 'Loading Queue...', Colors.grey),
-              ],
-            );
-          }
-          if (snapshot.hasError) {
-            return _buildQueueContainer(
-              children: [
-                _buildQueueItem(Icons.error_outline, 'Error: ${snapshot.error}',
-                    Colors.red),
-              ],
-            );
-          }
-          if (!snapshot.hasData ||
-              snapshot.data == null ||
-              snapshot.data!.isEmpty) {
-            return _buildQueueContainer(
-              children: [
-                _buildQueueItem(Icons.check_circle_outline, 'Farm Queue Empty',
-                    Colors.green),
-              ],
-            );
-          }
+      top: 38,
+      right: 2,
+      child: StreamBuilder<double?>(
+        stream: _firebaseService.getVirtualReservoirStream(),
+        builder: (context, reservoirSnap) {
+          final reservoir = reservoirSnap.data; // may be null while loading
 
-          final queue = snapshot.data!;
-          final farmsInQueue = queue.keys.toList()
-            ..sort((a, b) =>
-                (queue[b]['score'] as num).compareTo(queue[a]['score'] as num));
+          return StreamBuilder<Map<String, dynamic>?>(
+            stream: _firebaseService.getIrrigationQueueStream(),
+            builder: (context, queueSnap) {
+              // ---------- UI helpers ----------
+              Widget buildQueueItem(IconData icon, String text, Color color) =>
+                  _buildQueueItem(icon, text, color);
 
-          return _buildQueueContainer(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Text(
-                  'Irrigation Queue',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade800,
+              Widget buildContainer(List<Widget> children) =>
+                  _buildQueueContainer(children: children);
+
+              // ---------- Error / loading handling ----------
+              if (queueSnap.connectionState == ConnectionState.waiting) {
+                return buildContainer([
+                  buildQueueItem(
+                      Icons.pending, 'Loading Queue...', Colors.grey),
+                ]);
+              }
+              if (queueSnap.hasError) {
+                return buildContainer([
+                  buildQueueItem(
+                      Icons.error, 'Error: ${queueSnap.error}', Colors.red),
+                ]);
+              }
+
+              // ---------- Extract & sort the queue ----------
+              final Map<String, dynamic> queue = queueSnap.data ?? {};
+              final farmsInQueue = queue.keys.toList()
+                ..sort((a, b) => (queue[b]['score'] as num)
+                    .compareTo(queue[a]['score'] as num));
+
+              // Calculate total CWR
+              double totalCWR = 0.0;
+              for (var farmId in farmsInQueue) {
+                if (queue[farmId] is Map) {
+                  final farm = queue[farmId] as Map;
+                  totalCWR += (farm['liters'] as num?)?.toDouble() ?? 0.0;
+                }
+              }
+
+              // Check if total CWR is less than virtual reservoir and show warning
+              if (reservoir != null && totalCWR > reservoir) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _showInsufficientWaterWarning(
+                      context, farmsInQueue, totalCWR, reservoir);
+                });
+              }
+
+              // ---------- Build the overlay content ----------
+              return buildContainer([
+                // ••• virtual-reservoir line •••
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.local_drink, size: 14, color: Colors.teal),
+                    const SizedBox(width: 6),
+                    Text(
+                      reservoir == null
+                          ? 'Virtual Reservoir: …'
+                          : 'Virtual Reservoir: ${reservoir.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(height: 10, thickness: .5),
+                // Header
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Text(
+                    'Irrigation Queue',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800,
+                    ),
                   ),
                 ),
-              ),
-              const Divider(height: 8, thickness: 0.5),
-              ...farmsInQueue
-                  .where((id) => queue[id] is Map) // keep only real farm nodes
-                  .map((farmId) {
-                final farm = queue[farmId] as Map; // now it’s safe
-                final liters = farm['liters'] ?? '?';
-                return _buildQueueItem(
-                  Icons.water_drop,
-                  '$farmId : $liters L',
-                  Colors.blue.shade600,
-                );
-              }),
-            ],
+                const Divider(height: 8, thickness: .5),
+                // Queue items (or placeholder when empty)
+                if (queue.isEmpty)
+                  buildQueueItem(Icons.check_circle_outline, 'Farm Queue Empty',
+                      Colors.green)
+                else
+                  ...farmsInQueue.where((id) => queue[id] is Map).map((farmId) {
+                    final farm = queue[farmId] as Map;
+                    final liters = farm['liters'] ?? '?';
+                    return buildQueueItem(Icons.water_drop,
+                        '$farmId | CWR: $liters L', Colors.blue);
+                  }),
+              ]);
+            },
           );
         },
       ),
@@ -403,6 +516,67 @@ class _MapCardState extends State<MapCard> with TickerProviderStateMixin {
           ),
         ],
       ),
+    );
+  }
+
+  // New method to show the warning pop-up in Hiligaynon
+  void _showInsufficientWaterWarning(BuildContext context,
+      List<String> farmsInQueue, double totalCWR, double virtualReservoir) {
+    // Construct the list of farm names for the message
+    String farmNames = farmsInQueue.map((farmId) => '`$farmId`').join(', ');
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: const [
+              Icon(Icons.warning, color: Colors.red, size: 20),
+              SizedBox(width: 5),
+              Text(
+                'Paandam sa Tubig!', // "Water Warning!" in Hiligaynon
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Ang mga uma nga ${farmNames} posible nga indi maka-angkon sang bastante ukon wala gid sang tubig bangud kulang ang reserbasyon.', // "These farms (`farmNames`) might not get enough or no water because the reservoir is not enough."
+                  style: TextStyle(fontSize: 15),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Kabilugan nga kinahanglanon nga tubig (CWR): ${totalCWR.toStringAsFixed(2)} L',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Available nga reservoir: ${virtualReservoir.toStringAsFixed(2)} L',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Huo', // "Okay" in Hiligaynon
+                style:
+                    TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

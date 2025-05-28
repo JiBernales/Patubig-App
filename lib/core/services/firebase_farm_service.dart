@@ -24,7 +24,8 @@ class FirebaseService {
 
   // New method to get the irrigation queue
   Stream<Map<String, dynamic>?> getIrrigationQueueStream() {
-    DatabaseReference queueRef = FirebaseDatabase.instance.ref("irrigationQueue");
+    DatabaseReference queueRef =
+        FirebaseDatabase.instance.ref("irrigationQueue");
 
     return queueRef.onValue.map((DatabaseEvent event) {
       if (event.snapshot.value != null) {
@@ -37,7 +38,8 @@ class FirebaseService {
 
   // Optional: Get the irrigation queue status
   Stream<Map<String, dynamic>?> getIrrigationQueueStatusStream() {
-    DatabaseReference statusRef = FirebaseDatabase.instance.ref("irrigationQueueStatus");
+    DatabaseReference statusRef =
+        FirebaseDatabase.instance.ref("irrigationQueueStatus");
 
     return statusRef.onValue.map((DatabaseEvent event) {
       if (event.snapshot.value != null) {
@@ -45,5 +47,28 @@ class FirebaseService {
       }
       return null;
     });
+  }
+
+  /// Stream the current virtual-reservoir level (null until it exists).
+  Stream<double?> getVirtualReservoirStream() {
+    final ref = FirebaseDatabase.instance.ref('virtualReservoir');
+
+    return ref.onValue.map((event) {
+      if (event.snapshot.value == null) return null;
+
+      final raw = event.snapshot.value!;
+      return raw is num ? raw.toDouble() : double.tryParse(raw.toString());
+    });
+  }
+
+  /// Fetch the value once (useful in an initState or a manual refresh).
+  Future<double?> fetchVirtualReservoirOnce() async {
+    final ref = FirebaseDatabase.instance.ref('virtualReservoir');
+
+    final snap = await ref.get();
+    if (!snap.exists) return null;
+
+    final raw = snap.value!;
+    return raw is num ? raw.toDouble() : double.tryParse(raw.toString());
   }
 }

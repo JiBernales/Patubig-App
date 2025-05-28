@@ -152,7 +152,7 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> with TickerProv
             ),
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -191,7 +191,13 @@ class _WeatherStatsScreenState extends State<WeatherStatsScreen> with TickerProv
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: Colors.green.shade400,
+                                color: farmId == 'farm_001'
+                                  ? Colors.blue
+                                  : farmId == 'farm_002'
+                                    ? Colors.green
+                                    : farmId == 'farm_003'
+                                      ? Colors.orange
+                                      : Colors.grey,
                                 shape: BoxShape.circle,
                               ),
                             ),
